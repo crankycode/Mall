@@ -4,12 +4,17 @@ import android.hardware.Camera;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.hardware.Camera.Size;
+
+import java.io.IOException;
+import java.util.List;
 
 /**
  * Created by zuyi on 8/25/2015.
@@ -41,8 +46,49 @@ public class CameraFragment extends android.support.v4.app.Fragment {
 
         holder.setType(SurfaceHolder.SURFACE_TYPE_PUSH_BUFFERS);
 
+        holder.addCallback(new SurfaceHolder.Callback() {
 
+            @Override
+            public void surfaceCreated(SurfaceHolder holder) {
+                // Tell the camera to use this surface as its preview area
+                try {
+                    if (mCamera != null) {
+                        mCamera.setPreviewDisplay(holder);
+                    }
+                }catch(IOException exception) {
+                    Log.e(TAG, "Error setting up preview display", exception);
+                }
+            }
 
+            @Override
+            public void surfaceDestroyed(SurfaceHolder holder) {
+
+                // We can no longer display on this surface, so stop the preview.
+                if (mCamera != null) {
+                    mCamera.stopPreview();
+                }
+            }
+
+            @Override
+            public void surfaceChanged(SurfaceHolder holder, int format, int w, int h) {
+                if (mCamera == null) return;
+
+                // The surface has changed size; update the camera preview size
+                Camera.Parameters parameters = mCamera.getParameters();
+//                Camera.Size s = null; // To be reset in the new section
+                Size s = getBestSupportedSize(parameters.getSupportedPreviewSizes(), w, h);
+                parameters.setPreviewSize(s.width,s.height);
+                mCamera.setParameters(parameters);
+                try {
+                    mCamera.startPreview();
+                } catch (Exception e) {
+                    Log.e(TAG, "Could not start preview", e);
+                    mCamera.release();
+                    mCamera = null;
+                }
+            }
+
+        });
         return v;
     }
 
@@ -64,5 +110,19 @@ public class CameraFragment extends android.support.v4.app.Fragment {
             mCamera.release();
             mCamera = null;
         }
+    }
+
+    /** A simple algorithm to get the largest size available. **/
+    private Size getBestSupportedSize(List<Size> sizes, int width, int height) {
+        Size bestSize = sizes.get(0);
+        int largestArea = bestSize.width * bestSize.height;
+        for (Size s : sizes) {
+            int area = s.width * s.height;
+            if (area > largestArea) {
+                bestSize = s;
+                largestArea = area;
+            }
+        }
+        return bestSize;
     }
 }

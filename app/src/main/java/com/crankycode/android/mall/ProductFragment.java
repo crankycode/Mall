@@ -2,6 +2,7 @@ package com.crankycode.android.mall;
 
 import android.annotation.TargetApi;
 import android.content.Context;
+import android.content.Intent;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
@@ -463,6 +464,8 @@ public class ProductFragment extends Fragment {
         mAddImageButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                Intent i = new Intent(getActivity(), CameraActivity.class);
+                startActivity(i);
                 int marginTopBottom = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 15, getResources().getDisplayMetrics());
 
                 if (curNumImg < MAX_NO_OF_IMG) {
