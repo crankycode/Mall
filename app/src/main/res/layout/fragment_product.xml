@@ -1,0 +1,168 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent"
+    android:layout_height="wrap_content">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="fill_parent"
+        android:background="@color/grey"
+        android:orientation="vertical">
+
+
+        <GridLayout
+            android:id="@+id/imageGridLayout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:alignmentMode="alignBounds"
+            android:columnCount="8"
+            android:paddingLeft="15dp"
+            android:paddingRight="15dp"
+
+            android:useDefaultMargins="false">
+
+            <!--<ImageButton-->
+            <!--android:id="@+id/imageButton"-->
+            <!--android:layout_width="0px"-->
+            <!--android:layout_height="wrap_content"-->
+            <!--android:layout_column="0"-->
+            <!--android:layout_row="0"-->
+            <!--android:layout_marginTop="15dp"-->
+            <!--android:layout_marginBottom="15dp"-->
+            <!--android:background="@drawable/product_thumb_nail"-->
+            <!--android:layout_columnWeight="3"-->
+            <!--android:layout_gravity="fill" />-->
+
+            <!--<android.widget.Space-->
+            <!--android:id="@+id/space1"-->
+            <!--android:layout_width="0px"-->
+            <!--android:layout_column="1"-->
+            <!--android:layout_row="0"-->
+            <!--android:layout_columnWeight="1"-->
+            <!--android:layout_height="wrap_content"-->
+            <!--android:layout_gravity="fill" />-->
+
+            <ImageButton
+                android:id="@+id/addImageButton"
+                android:layout_width="0px"
+                android:layout_height="wrap_content"
+                android:layout_column="0"
+                android:layout_columnWeight="3"
+                android:layout_gravity="fill"
+                android:layout_marginBottom="15dp"
+                android:layout_marginTop="15dp"
+                android:layout_row="0"
+                android:adjustViewBounds="false"
+                android:background="@drawable/dash_plus_final" />
+
+            <!--<android.widget.Space-->
+            <!--android:layout_width="0px"-->
+            <!--android:layout_column="3"-->
+            <!--android:layout_row="0"-->
+            <!--android:layout_columnWeight="1"-->
+            <!--android:layout_height="wrap_content"-->
+            <!--android:layout_gravity="fill" />-->
+
+            <!--<ImageButton-->
+            <!--android:id="@+id/imageButton2"-->
+            <!--android:layout_width="0px"-->
+            <!--android:layout_height="wrap_content"-->
+            <!--android:layout_column="5"-->
+            <!--android:layout_row="0"-->
+            <!--android:layout_marginTop="15dp"-->
+            <!--android:layout_marginBottom="15dp"-->
+            <!--android:background="@drawable/product_thumb_nail"-->
+            <!--android:layout_columnWeight="3"-->
+            <!--android:layout_gravity="fill" />-->
+
+            <android.widget.Space
+                android:id="@+id/spaceWeight"
+                android:layout_width="0px"
+                android:layout_height="wrap_content"
+                android:layout_column="1"
+                android:layout_columnWeight="12"
+                android:layout_gravity="fill"
+                android:layout_row="0" />
+
+
+        </GridLayout>
+
+
+        <LinearLayout
+            android:layout_width="fill_parent"
+            android:layout_height="fill_parent"
+            android:layout_marginLeft="15dp"
+            android:layout_marginRight="15dp"
+            android:orientation="vertical">
+
+            <CheckBox
+                android:id="@+id/product_sold_checkbox"
+                style="?android:listSeparatorTextViewStyle"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:elevation="2dp"
+                android:text="@string/product_sold"
+                android:textAlignment="center" />
+
+            <EditText
+                android:id="@+id/product_name"
+                style="@style/mydrawable"
+                android:layout_width="match_parent"
+
+                android:hint="@string/product_name" />
+
+
+            <EditText
+                android:id="@+id/product_user_id"
+                style="@style/mydrawable"
+                android:layout_width="match_parent"
+                android:hint="@string/user_id" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="85dp"
+                android:orientation="horizontal">
+
+                <EditText
+                    android:id="@+id/product_price"
+                    style="@style/price"
+                    android:layout_width="0dp"
+                    android:layout_weight="1"
+                    android:hint="@string/product_price" />
+
+                <EditText
+                    android:id="@+id/product_stock"
+                    style="@style/stock"
+                    android:layout_width="0dp"
+                    android:layout_weight="1"
+                    android:hint="@string/product_stock" />
+            </LinearLayout>
+
+            <Spinner
+                android:id="@+id/product_category"
+                style="@style/spinner_style"
+                android:clickable="false" />
+
+            <Spinner
+                android:id="@+id/spinner_condition"
+                style="@style/spinner_style" />
+
+            <EditText
+                android:id="@+id/product_brand"
+                style="@style/mydrawable"
+                android:layout_width="match_parent"
+                android:hint="@string/product_brand" />
+
+            <Button
+                android:id="@+id/done_button"
+                android:layout_width="match_parent"
+                android:layout_height="65dp"
+                android:layout_marginBottom="15dp"
+                android:layout_marginTop="15dp"
+                android:text="@string/product_done" />
+        </LinearLayout>
+
+
+    </LinearLayout>
+
+</ScrollView>

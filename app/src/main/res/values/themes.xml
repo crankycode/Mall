@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources xmlns:tools="http://schemas.android.com/tools">
+    <!-- the theme applied to the application or activity -->
+    <style name="CustomActionBarTheme" parent="@style/Theme.AppCompat.Light">
+        <!-- Set style for actionbar !-->
+        <item name="android:actionBarStyle">@style/MyActionBar</item>
+        <!-- Set color style for status bar !-->
+        <item name="colorPrimaryDark">@color/actionbar</item>
+        <!-- Change the color of the Title !-->
+        <item name="android:textColorPrimary">@android:color/white</item>
+        <!-- Change the color of the menu !-->
+        <!-- Support library compatibility -->
+        <item name="actionBarStyle">@style/MyActionBar</item>
+    </style>
+
+    <!-- ActionBar styles -->
+    <style name="MyActionBar" parent="@style/Widget.AppCompat.Light.ActionBar.Solid.Inverse">
+        <item name="android:background" tools:ignore="NewApi">@color/actionbar</item>
+        <item name="background">@color/actionbar</item>
+    </style>
+
+    <style name="AppThemeNew" parent="Theme.AppCompat.Light.DarkActionBar">
+        <item name="android:colorPrimary">@color/actionbar</item>
+        <item name="colorPrimaryDark">@color/actionbar</item>
+        <item name="actionBarStyle">@style/AbStyle</item>
+        <item name="actionModeBackground">@color/actionbar</item>
+    </style>
+
+    <style name="AbStyle" parent="Widget.AppCompat.Toolbar">
+        <item name="elevation">2dp</item>
+        <item name="displayOptions">homeAsUp|showTitle</item>
+        <item name="android:background" tools:ignore="NewApi">@color/actionbar</item>
+        <item name="background">@color/actionbar</item>
+        <!--showHome-->
+    </style>
+
+    <style name="AppThemeDark" parent="Theme.AppCompat">
+        <item name="actionBarStyle">@style/AbStyle</item>
+    </style>
+</resources>

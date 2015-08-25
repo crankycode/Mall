@@ -1,0 +1,36 @@
+<resources>
+    <string name="app_name">Mall</string>
+    <string name="user_id"> Username</string>
+    <string name="product_sold"> Sold</string>
+    <string name="product_name"> Product Name</string>
+    <string name="product_price"> Price</string>
+    <string name="product_stock"> Stock</string>
+    <string name="product_dateStartSale"> Date Start Sale</string>
+    <string name="product_condition"> Condition</string>
+    <string name="product_brand"> Brand</string>
+    <string name="product_done"> Done</string>
+    <string name="product_title">Products</string>
+
+    <string name="new_product">New Product</string>
+    <string name="show_subtitle">Show Subtitle</string>
+    <string name="hide_subtitle">Hide Subtitle</string>
+    <string name="subtitle">If you see something, say something.</string>
+    <string name="delete_product">Delete</string>
+    <string name="take">Take</string>
+
+    <string-array name="condition_array">
+        <item>New (sealed/with tags)</item>
+        <item>New (unsealed/without tags)</item>
+        <item>New (with defects)</item>
+        <item>Used</item>
+    </string-array>
+    <string-array name="category_array">
+        <item>Women Apparel</item>
+        <item>Men Apparel</item>
+        <item>Accessories</item>
+        <item>Watches</item>
+        <item>Bags</item>
+        <item>Cosmetics &amp; Fragrances</item>
+    </string-array>
+
+</resources>
