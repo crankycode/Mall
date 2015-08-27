@@ -1,5 +1,6 @@
 package com.crankycode.android.mall;
 
+import android.content.Context;
 import android.hardware.Camera;
 import android.os.Build;
 import android.os.Bundle;
@@ -13,8 +14,10 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.hardware.Camera.Size;
 
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.List;
+import java.util.UUID;
 
 /**
  * Created by zuyi on 8/25/2015.
@@ -25,17 +28,62 @@ public class CameraFragment extends android.support.v4.app.Fragment {
 
     private Camera mCamera;
     private SurfaceView mSurfaceView;
+    private View mProgressContainer;
 
+    private Camera.ShutterCallback mShutterCallback = new Camera.ShutterCallback() {
+        @Override
+        public void onShutter() {
+            // Display the progress indicator
+            mProgressContainer.setVisibility(View.VISIBLE);
+        }
+    };
+
+    private Camera.PictureCallback mJpegCallback = new Camera.PictureCallback() {
+        @Override
+        public void onPictureTaken(byte[] data, Camera camera) {
+            // Create a filename
+            String filename = UUID.randomUUID().toString() + ".jpg";
+            // Save the jpeg data to disk
+            FileOutputStream os = null;
+            boolean success = true;
+            try {
+                os = getActivity().openFileOutput(filename, Context.MODE_PRIVATE);
+                os.write(data);
+            } catch (Exception e) {
+                Log.e(TAG, "Error writing to file " + filename, e);
+                success = false;
+            } finally {
+                try {
+                    if (os != null)
+                        os.close();
+                } catch (Exception e) {
+                    Log.e(TAG, "Error closing file " + filename, e);
+                    success = false;
+                }
+            }
+
+            if (success) {
+                Log.i(TAG, "JPEG saved at " + filename);
+            }
+            getActivity().finish();
+        }
+    };
 
     @Override
     @SuppressWarnings("deprecation")
     public View onCreateView(LayoutInflater inflater, ViewGroup parent, Bundle savedInstanceState) {
         View v =inflater.inflate(R.layout.fragment_camera, parent, false);
 
+        // For the progress bar
+        mProgressContainer = v.findViewById(R.id.camera_progressContainer);
+        mProgressContainer.setVisibility(View.INVISIBLE);
+
         Button takePictureButton = (Button)v.findViewById(R.id.camera_takePictureButton);
         takePictureButton.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
-                getActivity().finish();
+                if (mCamera != null) {
+                    mCamera.takePicture(mShutterCallback, null, mJpegCallback);
+                }
             }
         });
         mSurfaceView = (SurfaceView)v.findViewById(R.id.camera_surfaceView);
@@ -78,6 +126,9 @@ public class CameraFragment extends android.support.v4.app.Fragment {
 //                Camera.Size s = null; // To be reset in the new section
                 Size s = getBestSupportedSize(parameters.getSupportedPreviewSizes(), w, h);
                 parameters.setPreviewSize(s.width,s.height);
+                // Find best picture size and set the parameter
+                s = getBestSupportedSize(parameters.getSupportedPictureSizes(), w, h);
+                parameters.setPictureSize(s.width, s.height);
                 mCamera.setParameters(parameters);
                 try {
                     mCamera.startPreview();
@@ -111,6 +162,7 @@ public class CameraFragment extends android.support.v4.app.Fragment {
             mCamera = null;
         }
     }
+
 
     /** A simple algorithm to get the largest size available. **/
     private Size getBestSupportedSize(List<Size> sizes, int width, int height) {
