@@ -13,7 +13,7 @@
 
         <meta-data
             android:name="com.crankycode.android.mall.IP_ADDRESS"
-            android:value="http://192.168.1.27:9000" />
+            android:value="http://localhost:9000" />
 
         <activity android:name=".ProductListActivity">
             <intent-filter>

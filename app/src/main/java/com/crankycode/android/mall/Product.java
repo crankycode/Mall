@@ -6,6 +6,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.Map;
 import java.util.UUID;
@@ -19,6 +20,7 @@ public class Product {
     private static final String JSON_PRODUCT = "product";
     private static final String JSON_SOLD = "sold";
     private static final String JSON_CREATED = "created";
+    private static final String JSON_PHOTO = "photo";
 
     private UUID mId;
     private Date mDate;
@@ -31,6 +33,8 @@ public class Product {
     private String mBrand;
     private String[] mCondition = {"0", "0"};
     private String[] mCategory = {"0", "0"};
+//    private Photo mPhoto;
+    private ArrayList<Photo> mPhoto = new ArrayList<Photo>();
 
     public Date getDate() {
         return mDate;
@@ -71,6 +75,15 @@ public class Product {
     public String getBrand() {
         return mBrand;
     }
+
+//    public Photo getPhoto() {
+//        return mPhoto;
+//    }
+
+    public Photo getPhoto(int id) {
+        return mPhoto.get(id);
+    }
+
 
     public void setDate(Date mDate) {
 
@@ -123,6 +136,9 @@ public class Product {
     public void setProductName(String productName) {
         this.mProductName = productName;
     }
+    public void setPhoto(Photo p) {
+        mPhoto.add(p);
+    }
 
 
     public Product() {
@@ -140,6 +156,9 @@ public class Product {
         mSold = json.getBoolean(JSON_SOLD);
         mDate = new Date(json.getLong(JSON_CREATED));
 
+        if (json.has(JSON_PHOTO)) {
+            mPhoto.add(new Photo(json.getJSONObject(JSON_PHOTO)));
+        }
     }
 
     @Override
@@ -153,6 +172,10 @@ public class Product {
         json.put(JSON_PRODUCT, mProductName);
         json.put(JSON_SOLD, mSold);
         json.put(JSON_CREATED, mDate.getTime());
+        if(mPhoto != null) {
+            json.put(JSON_PHOTO,mPhoto);
+        }
+
         return json;
     }
 }

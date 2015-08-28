@@ -1,6 +1,8 @@
 package com.crankycode.android.mall;
 
+import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
 import android.hardware.Camera;
 import android.os.Build;
 import android.os.Bundle;
@@ -25,6 +27,7 @@ import java.util.UUID;
 public class CameraFragment extends android.support.v4.app.Fragment {
 
     private static final String TAG = "CameraFragment";
+    public static final String EXTRA_PHOTO_FILENAME ="com.crankycode.android.mall.photo_filename";
 
     private Camera mCamera;
     private SurfaceView mSurfaceView;
@@ -63,8 +66,15 @@ public class CameraFragment extends android.support.v4.app.Fragment {
             }
 
             if (success) {
+                Intent i = new Intent();
+                i.putExtra(EXTRA_PHOTO_FILENAME, filename);
+                getActivity().setResult(Activity.RESULT_OK, i);
+
                 Log.i(TAG, "JPEG saved at " + filename);
+            } else {
+                getActivity().setResult(Activity.RESULT_CANCELED);
             }
+
             getActivity().finish();
         }
     };
