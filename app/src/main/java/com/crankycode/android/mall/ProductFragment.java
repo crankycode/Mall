@@ -77,6 +77,8 @@ public class ProductFragment extends Fragment {
     int curNumImg = 0;
     int imgIdCounter = 0;
 
+    boolean onResult = false;
+
     OkHttpClient client;
     Gson jsonConvertor;
     RestAdapter restAdapter;
@@ -126,7 +128,24 @@ public class ProductFragment extends Fragment {
     @Override
     public void onStart() {
         super.onStart();
+        Log.d(TAG,"onStart was called");
+//        if (getActivity().getCallingActivity() == null) {
+//            Log.d(TAG,"The calling activity: " + getActivity().getCallingActivity());
+//            reloadImage();
+//        }
+    }
 
+    @Override
+    public void onResume() {
+        super.onResume();
+        Log.d(TAG,"onResume was called");
+        ArrayList<Photo> photoArray = mProduct.getPhotoArray();
+
+        if (onResult == false && photoArray.size() != 0) {
+            Log.d(TAG,"The photoArray size: " + photoArray.size());
+            Log.d(TAG,"The calling activity: " + getActivity().getCallingActivity());
+            reloadImage();
+        }
     }
 
     @Override
@@ -510,6 +529,7 @@ public class ProductFragment extends Fragment {
         if( resultCode != Activity.RESULT_OK) return;
 
         if (requestCode == REQUEST_PHOTO) {
+            onResult = true;
             String filename = data.getStringExtra(CameraFragment.EXTRA_PHOTO_FILENAME);
             if (filename != null)
                 Log.d(TAG,"filename: " + filename);
@@ -612,7 +632,7 @@ public class ProductFragment extends Fragment {
 
                 Log.d("ProductFragment", "Else case: row:" + row + " col:" + LAST_COL);
                 // Add New ImgButton1
-                ImageButton img_bt = new ImageButton(getActivity());
+                final ImageButton img_bt = new ImageButton(getActivity());
 
                 // Add the captured image onto the thumbnail
                 Photo pic = mProduct.getPhoto(imgIdCounter);
@@ -632,6 +652,198 @@ public class ProductFragment extends Fragment {
 
                 if (row == 0)
                     newImageParams.topMargin = marginTopBottom;
+
+                newImageParams.bottomMargin = marginTopBottom;
+                newImageParams.columnSpec = GridLayout.spec(LAST_COL, 3f);
+                newImageParams.setGravity(Gravity.FILL);
+                newImageParams.rowSpec = GridLayout.spec(row);
+
+                // Setting imageId
+                img_bt.setId(imgIdCounter);
+                imgIdCounter++;
+
+                img_bt.setLayoutParams(newImageParams);
+                img_bt.setBackgroundDrawable(null);
+                img_bt.setScaleType(ImageView.ScaleType.FIT_CENTER);
+                img_bt.setAdjustViewBounds(true);
+                img_bt.setPadding(0, 0, 0, 0);
+
+                img_bt.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+
+                        Log.d(TAG, "Image Id is: " + img_bt.getId());
+
+                        Photo p = mProduct.getPhoto(img_bt.getId());
+                        if (p == null)
+                            return;
+                        FragmentManager fm = getActivity()
+                                .getSupportFragmentManager();
+                        String path = getActivity().getFileStreamPath(p.getFilename()).getAbsolutePath();
+                        ImageFragment.newInstance(path).show(fm, DIALOG_IMAGE);
+
+
+                    }
+                });
+
+                mImageGridLayout.addView(img_bt);
+
+
+                // increase row by 1
+                row += 1;
+                // reset col to 0
+                col = 0;
+
+                //Adjust Add ImageButton
+                GridLayout.LayoutParams adjImageParams1 = new GridLayout.LayoutParams();
+                adjImageParams1.columnSpec = GridLayout.spec(col, 3f);
+                adjImageParams1.rowSpec = GridLayout.spec(row);
+                adjImageParams1.bottomMargin = marginTopBottom;
+                adjImageParams1.width = 0;
+                adjImageParams1.setGravity(Gravity.FILL);
+                mAddImageButton = (ImageButton) getActivity().findViewById(R.id.addImageButton);
+                mAddImageButton.setLayoutParams(adjImageParams1);
+
+                // Adjustable Space
+                GridLayout.LayoutParams mSpaceParams = new GridLayout.LayoutParams();
+                mSpaceParams.width = 0;
+//                    Log.d("ProductFragment", "Col Count: " + col + 3);
+                mSpaceParams.columnSpec = GridLayout.spec(col + 1, 6, INITIAL_SPACE_WEIGHT);
+                mSpaceParams.rowSpec = GridLayout.spec(row);
+
+                mSpaceParams.setGravity(Gravity.FILL);
+                mSpaceWeight.setLayoutParams(mSpaceParams);
+
+                // reset num of image
+                curNumImg = 0;
+            }
+        }
+    }
+
+    public void reloadImage() {
+        ArrayList<Photo> photoArray = mProduct.getPhotoArray();
+        int marginTopBottom = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 15, getResources().getDisplayMetrics());
+
+        for (int i =0; i < photoArray.size(); i++) {
+            String filename = photoArray.get(i).getFilename();
+            Photo p = new Photo(filename);
+
+            Log.d(TAG, "photofile name: " + filename);
+
+            if (curNumImg < MAX_NO_OF_IMG) {
+
+                // Add New ImgButton1
+                final ImageButton img_bt = new ImageButton(getActivity());
+
+                // Add the image onto the thumbnail
+                Photo pic = mProduct.getPhoto(imgIdCounter);
+                BitmapDrawable b = null;
+                if (p != null) {
+                    String path = getActivity().getFileStreamPath(pic.getFilename()).getAbsolutePath();
+                    b = PictureUtils.getScaledDrawable(getActivity(), path);
+                    img_bt.setImageDrawable(b);
+                } else {
+                    img_bt.setImageResource(R.drawable.product_thumb_nail);
+                }
+
+                GridLayout.LayoutParams newImageParams = new GridLayout.LayoutParams();
+                newImageParams.width = 0;
+                newImageParams.height = GridLayout.LayoutParams.WRAP_CONTENT;
+
+                if (row == 0)
+                    newImageParams.topMargin = marginTopBottom;
+                newImageParams.bottomMargin = marginTopBottom;
+                newImageParams.columnSpec = GridLayout.spec(col, 3f);
+                newImageParams.rowSpec = GridLayout.spec(row);
+                newImageParams.setGravity(Gravity.FILL);
+
+                // Setting imageId
+                img_bt.setId(imgIdCounter);
+                imgIdCounter++;
+
+                img_bt.setLayoutParams(newImageParams);
+                img_bt.setBackgroundDrawable(null);
+                img_bt.setScaleType(ImageView.ScaleType.FIT_CENTER);
+                img_bt.setAdjustViewBounds(true);
+                img_bt.setPadding(0, 0, 0, 0);
+                mImageGridLayout.addView(img_bt);
+
+                img_bt.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+
+                        Log.d(TAG, "Image Id is: " + img_bt.getId());
+
+                        Photo p = mProduct.getPhoto(img_bt.getId());
+                        if (p == null)
+                            return;
+                        FragmentManager fm = getActivity()
+                                .getSupportFragmentManager();
+                        String path = getActivity().getFileStreamPath(p.getFilename()).getAbsolutePath();
+                        ImageFragment.newInstance(path).show(fm, DIALOG_IMAGE);
+
+
+                    }
+
+
+                });
+
+                // Add New Space Between NewImage and Add Button
+                Space mSpace1 = new Space(getActivity());
+                GridLayout.LayoutParams mSpaceParams1 = new GridLayout.LayoutParams();
+                mSpaceParams1.width = 0;
+                mSpaceParams1.columnSpec = GridLayout.spec(col + 1, 1f);
+                mSpaceParams1.rowSpec = GridLayout.spec(row);
+                mSpaceParams1.setGravity(Gravity.FILL);
+                mSpace1.setLayoutParams(mSpaceParams1);
+                mImageGridLayout.addView(mSpace1);
+
+                //Adjust Add ImageButton
+                GridLayout.LayoutParams adjImageParams1 = new GridLayout.LayoutParams();
+                adjImageParams1.columnSpec = GridLayout.spec(col + 2, 3f);
+                adjImageParams1.rowSpec = GridLayout.spec(row);
+                adjImageParams1.width = 0;
+                adjImageParams1.setGravity(Gravity.FILL);
+                mAddImageButton = (ImageButton) getActivity().findViewById(R.id.addImageButton);
+                mAddImageButton.setLayoutParams(adjImageParams1);
+
+                // Adjustable Space
+                GridLayout.LayoutParams mSpaceParams = new GridLayout.LayoutParams();
+                mSpaceParams.width = 0;
+//                    Log.d("ProductFragment", "Col Count: " + col + 3);
+                mSpaceParams.columnSpec = GridLayout.spec(col + 3, MAX_SPAN - (col + 2), spaceWeight);
+                mSpaceParams.rowSpec = GridLayout.spec(row);
+                mSpaceParams.setGravity(Gravity.FILL);
+                mSpaceWeight.setLayoutParams(mSpaceParams);
+
+                spaceWeight -= 4f;
+                col += 2;
+                if (!(p == null))
+                    curNumImg += 1;
+
+            } else {
+                Log.d("ProductFragment", "Else case: row:" + row + " col:" + LAST_COL);
+                // Add New ImgButton1
+                ImageButton img_bt = new ImageButton(getActivity());
+
+                Photo pic = mProduct.getPhoto(imgIdCounter);
+                BitmapDrawable b = null;
+
+                if (p != null) {
+                    String path = getActivity().getFileStreamPath(pic.getFilename()).getAbsolutePath();
+                    b = PictureUtils.getScaledDrawable(getActivity(), path);
+                    img_bt.setImageDrawable(b);
+                } else {
+                    img_bt.setImageResource(R.drawable.product_thumb_nail);
+                }
+
+                GridLayout.LayoutParams newImageParams = new GridLayout.LayoutParams();
+                newImageParams.width = 0;
+                newImageParams.height = GridLayout.LayoutParams.WRAP_CONTENT;
+
+                if (row == 0)
+                    newImageParams.topMargin = marginTopBottom;
+
 
                 newImageParams.bottomMargin = marginTopBottom;
                 newImageParams.columnSpec = GridLayout.spec(LAST_COL, 3f);
@@ -673,8 +885,191 @@ public class ProductFragment extends Fragment {
                 // reset num of image
                 curNumImg = 0;
             }
+
         }
+
     }
+
+//    public void reloadImage() {
+//        int marginTopBottom = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 15, getResources().getDisplayMetrics());
+//
+//
+//        ArrayList<Photo> photoArray = mProduct.getPhotoArray();
+////        String filename = data.getStringExtra(CameraFragment.EXTRA_PHOTO_FILENAME);
+//
+//        int mycurNumImg = 0;
+//        int myCol = 0;
+//        for (int i =0; i < photoArray.size(); i++) {
+//
+//            String filename = photoArray.get(i).getFilename();
+//            Log.d(TAG, "filename: " + filename);
+//            Log.d(TAG, "Loading filename: " + filename);
+//
+//            if (filename != null)
+//                Log.d(TAG, "filename: " + filename);
+//            Photo p = new Photo(filename);
+//            // Add the new Photo to Product
+//            mProduct.setPhoto((p));
+//            Log.i(TAG, "Product: " + mProduct.getProductName() + " has a photo");
+//
+//            if (mycurNumImg < MAX_NO_OF_IMG) {
+//
+//                // Add New ImgButton1
+//                final ImageButton img_bt = new ImageButton(getActivity());
+////                img_bt.setImageResource(R.drawable.product_thumb_nail);
+//
+//                // Add the captured image onto the thumbnail
+//                Photo pic = mProduct.getPhoto(imgIdCounter);
+//                BitmapDrawable b = null;
+//                if (p != null) {
+//                    String path = getActivity().getFileStreamPath(pic.getFilename()).getAbsolutePath();
+//                    b = PictureUtils.getScaledDrawable(getActivity(), path);
+//                    img_bt.setImageDrawable(b);
+//                } else {
+//                    img_bt.setImageResource(R.drawable.product_thumb_nail);
+//                }
+//
+//
+//                GridLayout.LayoutParams newImageParams = new GridLayout.LayoutParams();
+//                newImageParams.width = 0;
+//                newImageParams.height = GridLayout.LayoutParams.WRAP_CONTENT;
+//                if (row == 0)
+//                    newImageParams.topMargin = marginTopBottom;
+//                newImageParams.bottomMargin = marginTopBottom;
+//                newImageParams.columnSpec = GridLayout.spec(myCol, 3f);
+//                newImageParams.rowSpec = GridLayout.spec(row);
+//                newImageParams.setGravity(Gravity.FILL);
+//
+//                // Setting imageId
+//                img_bt.setId(imgIdCounter);
+//                imgIdCounter++;
+//
+//                img_bt.setLayoutParams(newImageParams);
+//                img_bt.setBackgroundDrawable(null);
+//                img_bt.setScaleType(ImageView.ScaleType.FIT_CENTER);
+//                img_bt.setAdjustViewBounds(true);
+//                img_bt.setPadding(0, 0, 0, 0);
+//                mImageGridLayout.addView(img_bt);
+//
+//                img_bt.setOnClickListener(new View.OnClickListener() {
+//                    @Override
+//                    public void onClick(View v) {
+//
+//                        Log.d(TAG, "Image Id is: " + img_bt.getId());
+//
+//                        Photo p = mProduct.getPhoto(img_bt.getId());
+//                        if (p == null)
+//                            return;
+//                        FragmentManager fm = getActivity()
+//                                .getSupportFragmentManager();
+//                        String path = getActivity().getFileStreamPath(p.getFilename()).getAbsolutePath();
+//                        ImageFragment.newInstance(path).show(fm, DIALOG_IMAGE);
+//
+//
+//                    }
+//
+//
+//                });
+//
+//                // Add New Space Between NewImage and Add Button
+//                Space mSpace1 = new Space(getActivity());
+//                GridLayout.LayoutParams mSpaceParams1 = new GridLayout.LayoutParams();
+//                mSpaceParams1.width = 0;
+//                mSpaceParams1.columnSpec = GridLayout.spec(myCol + 1, 1f);
+//                mSpaceParams1.rowSpec = GridLayout.spec(row);
+//                mSpaceParams1.setGravity(Gravity.FILL);
+//                mSpace1.setLayoutParams(mSpaceParams1);
+//                mImageGridLayout.addView(mSpace1);
+//
+//                //Adjust Add ImageButton
+//                GridLayout.LayoutParams adjImageParams1 = new GridLayout.LayoutParams();
+//                adjImageParams1.columnSpec = GridLayout.spec(myCol + 2, 3f);
+//                adjImageParams1.rowSpec = GridLayout.spec(row);
+//                adjImageParams1.width = 0;
+//                adjImageParams1.setGravity(Gravity.FILL);
+//                mAddImageButton = (ImageButton) getActivity().findViewById(R.id.addImageButton);
+//                mAddImageButton.setLayoutParams(adjImageParams1);
+//
+//                // Adjustable Space
+//                GridLayout.LayoutParams mSpaceParams = new GridLayout.LayoutParams();
+//                mSpaceParams.width = 0;
+////                    Log.d("ProductFragment", "myCol Count: " + myCol + 3);
+//                mSpaceParams.columnSpec = GridLayout.spec(myCol + 3, MAX_SPAN - (myCol + 2), spaceWeight);
+//                mSpaceParams.rowSpec = GridLayout.spec(row);
+//                mSpaceParams.setGravity(Gravity.FILL);
+//                mSpaceWeight.setLayoutParams(mSpaceParams);
+//
+//                spaceWeight -= 4f;
+//                myCol += 2;
+//                mycurNumImg += 1;
+//
+//            } else {
+//
+//                Log.d("ProductFragment", "Else case: row:" + row + " myCol:" + LAST_COL);
+//                // Add New ImgButton1
+//                ImageButton img_bt = new ImageButton(getActivity());
+//
+//                // Add the captured image onto the thumbnail
+//                Photo pic = mProduct.getPhoto(mycurNumImg);
+//                BitmapDrawable b = null;
+//
+//                if (p != null) {
+//                    String path = getActivity().getFileStreamPath(pic.getFilename()).getAbsolutePath();
+//                    b = PictureUtils.getScaledDrawable(getActivity(), path);
+//                    img_bt.setImageDrawable(b);
+//                } else {
+//                    img_bt.setImageResource(R.drawable.product_thumb_nail);
+//                }
+//
+//                GridLayout.LayoutParams newImageParams = new GridLayout.LayoutParams();
+//                newImageParams.width = 0;
+//                newImageParams.height = GridLayout.LayoutParams.WRAP_CONTENT;
+//
+//                if (row == 0)
+//                    newImageParams.topMargin = marginTopBottom;
+//
+//                newImageParams.bottomMargin = marginTopBottom;
+//                newImageParams.columnSpec = GridLayout.spec(LAST_COL, 3f);
+//                newImageParams.setGravity(Gravity.FILL);
+//                newImageParams.rowSpec = GridLayout.spec(row);
+//
+//                img_bt.setLayoutParams(newImageParams);
+//                img_bt.setBackgroundDrawable(null);
+//                img_bt.setScaleType(ImageView.ScaleType.FIT_CENTER);
+//                img_bt.setAdjustViewBounds(true);
+//                img_bt.setPadding(0, 0, 0, 0);
+//                mImageGridLayout.addView(img_bt);
+//
+//                // increase row by 1
+//                row += 1;
+//                // reset col to 0
+//                myCol = 0;
+//
+//                //Adjust Add ImageButton
+//                GridLayout.LayoutParams adjImageParams1 = new GridLayout.LayoutParams();
+//                adjImageParams1.columnSpec = GridLayout.spec(myCol, 3f);
+//                adjImageParams1.rowSpec = GridLayout.spec(row);
+//                adjImageParams1.bottomMargin = marginTopBottom;
+//                adjImageParams1.width = 0;
+//                adjImageParams1.setGravity(Gravity.FILL);
+//                mAddImageButton = (ImageButton) getActivity().findViewById(R.id.addImageButton);
+//                mAddImageButton.setLayoutParams(adjImageParams1);
+//
+//                // Adjustable Space
+//                GridLayout.LayoutParams mSpaceParams = new GridLayout.LayoutParams();
+//                mSpaceParams.width = 0;
+////                    Log.d("ProductFragment", "Col Count: " + col + 3);
+//                mSpaceParams.columnSpec = GridLayout.spec(myCol + 1, 6, INITIAL_SPACE_WEIGHT);
+//                mSpaceParams.rowSpec = GridLayout.spec(row);
+//
+//                mSpaceParams.setGravity(Gravity.FILL);
+//                mSpaceWeight.setLayoutParams(mSpaceParams);
+//
+//                // reset num of image
+//                mycurNumImg = 0;
+//            }
+//        }
+//    }
 
 
 }

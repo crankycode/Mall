@@ -1,10 +1,16 @@
 package com.crankycode.android.mall;
 
 import android.text.format.DateFormat;
+import android.util.Log;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
+
+import java.lang.reflect.Array;
+import java.lang.reflect.Type;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -16,6 +22,9 @@ import java.util.Vector;
  * Created by zuyi on 7/3/2015.
  */
 public class Product {
+
+    private static final String TAG = "Product";
+
     private static final String JSON_ID = "id";
     private static final String JSON_PRODUCT = "product";
     private static final String JSON_SOLD = "sold";
@@ -84,6 +93,9 @@ public class Product {
         return mPhoto.get(id);
     }
 
+    public ArrayList<Photo> getPhotoArray() {
+        return mPhoto;
+    }
 
     public void setDate(Date mDate) {
 
@@ -156,9 +168,21 @@ public class Product {
         mSold = json.getBoolean(JSON_SOLD);
         mDate = new Date(json.getLong(JSON_CREATED));
 
-        if (json.has(JSON_PHOTO)) {
-            mPhoto.add(new Photo(json.getJSONObject(JSON_PHOTO)));
-        }
+
+        /** ToDo: 2) Convert this from gson string to ArrayList<Photo>
+         *  refer to http://kodejava.org/how-do-i-convert-collections-into-json/
+         */
+
+        Gson gson = new Gson();
+        Type type = new TypeToken<ArrayList<Photo>>(){}.getType();
+
+        String photo = json.getString(JSON_PHOTO);
+        mPhoto = (gson.fromJson(photo,type));
+        Log.d(TAG,"Retrieve Photo: " +  mPhoto.toString());
+//
+//        if (json.has(JSON_PHOTO)) {
+//            mPhoto.add(new ArrayList(json.getJSONArray(JSON_PHOTO)));
+//        }
     }
 
     @Override
@@ -172,9 +196,19 @@ public class Product {
         json.put(JSON_PRODUCT, mProductName);
         json.put(JSON_SOLD, mSold);
         json.put(JSON_CREATED, mDate.getTime());
-        if(mPhoto != null) {
-            json.put(JSON_PHOTO,mPhoto);
-        }
+
+        /** ToDo: 1) Use gson to convert ArrayList<Photo> to gson string
+         * refer to http://kodejava.org/how-do-i-convert-collections-into-json/
+         */
+        Gson gson = new Gson();
+
+        String photo = gson.toJson(mPhoto);
+        Log.d(TAG, "The converted photo: " + photo);
+        json.put(JSON_PHOTO,photo);
+
+//        if(mPhoto != null) {
+//            json.put(JSON_PHOTO,mPhoto);
+//        }
 
         return json;
     }
